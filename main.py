@@ -1,6 +1,13 @@
 """한국사 퀴즈 게임 - 콘솔 프로그램 진입점"""
 
+import json
+import os
+
 from default_quizzes import get_default_quizzes
+from quiz import Quiz
+
+# 프로젝트 루트(이 파일이 있는 폴더)의 state.json
+STATE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "state.json")
 
 
 class QuizGame:
@@ -14,9 +21,57 @@ class QuizGame:
         5: "종료",
     }
 
-    def __init__(self):
+    def __init__(self, state_file=STATE_FILE):
         self.running = True
-        self.quizzes = get_default_quizzes()  # 퀴즈 목록 (list[Quiz])
+        self.state_file = state_file
+        self.quizzes = []        # 퀴즈 목록 (list[Quiz])
+        self.best_score = None   # 최고 점수 (int, 아직 풀지 않았으면 None)
+        self.load()
+
+    # ---------- 파일 저장/불러오기 ----------
+    def load(self):
+        """state.json에서 퀴즈와 최고 점수를 불러온다."""
+        if not os.path.exists(self.state_file):
+            # 첫 실행: 기본 퀴즈 데이터 사용
+            self.reset_to_default()
+            return
+        try:
+            with open(self.state_file, "r", encoding="utf-8") as file:
+                data = json.load(file)
+            quizzes = [Quiz.from_dict(item) for item in data["quizzes"]]
+            best_score = data.get("best_score")
+            if best_score is not None and (
+                not isinstance(best_score, int) or isinstance(best_score, bool)
+                or not 0 <= best_score <= 100
+            ):
+                raise ValueError("best_score 값이 올바르지 않습니다.")
+        except (OSError, ValueError, KeyError, TypeError) as error:
+            # json.JSONDecodeError, UnicodeDecodeError 도 ValueError의 하위 클래스
+            print(f"[안내] 데이터 파일(state.json)을 읽을 수 없습니다: {error}")
+            print("[안내] 기본 퀴즈 데이터로 복구합니다.")
+            self.reset_to_default()
+            self.save()
+            return
+        self.quizzes = quizzes
+        self.best_score = best_score
+
+    def save(self):
+        """현재 퀴즈와 최고 점수를 state.json에 저장한다. 성공하면 True."""
+        data = {
+            "quizzes": [quiz.to_dict() for quiz in self.quizzes],
+            "best_score": self.best_score,
+        }
+        try:
+            with open(self.state_file, "w", encoding="utf-8") as file:
+                json.dump(data, file, ensure_ascii=False, indent=2)
+            return True
+        except OSError as error:
+            print(f"[안내] 데이터를 저장하지 못했습니다: {error}")
+            return False
+
+    def reset_to_default(self):
+        self.quizzes = get_default_quizzes()
+        self.best_score = None
 
     # ---------- 입력 처리 ----------
     def read_number(self, prompt, min_value, max_value):
@@ -64,10 +119,12 @@ class QuizGame:
                 choice = self.read_number(f"메뉴를 선택하세요 (1-{len(self.MENU)}): ", 1, len(self.MENU))
                 self.handle_choice(choice)
         except (KeyboardInterrupt, EOFError):
-            print("\n\n[안내] 입력이 중단되어 프로그램을 안전하게 종료합니다.")
+            print("\n\n[안내] 입력이 중단되었습니다. 데이터를 저장하고 안전하게 종료합니다.")
+            self.save()
 
     def quit(self):
-        print("\n게임을 종료합니다. 안녕히 가세요!")
+        self.save()
+        print("\n데이터를 저장했습니다. 게임을 종료합니다. 안녕히 가세요!")
         self.running = False
 
     # ---------- 기능 (구현 예정) ----------

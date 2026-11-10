@@ -11,3 +11,6 @@ env/
 .idea/
 .DS_Store
 Thumbs.db
+
+# 실행 데이터 (프로그램이 자동 생성)
+state.json

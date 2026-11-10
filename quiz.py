@@ -29,3 +29,27 @@ class Quiz:
     def correct_choice(self):
         """정답 선택지의 내용을 반환한다."""
         return self.choices[self.answer - 1]
+
+    def to_dict(self):
+        """JSON 저장을 위해 딕셔너리로 변환한다."""
+        return {
+            "question": self.question,
+            "choices": self.choices,
+            "answer": self.answer,
+        }
+
+    @classmethod
+    def from_dict(cls, data):
+        """딕셔너리로부터 Quiz 객체를 만든다. 형식이 잘못되면 ValueError를 발생시킨다."""
+        if not isinstance(data, dict):
+            raise ValueError("퀴즈 데이터가 딕셔너리 형식이 아닙니다.")
+        question = data.get("question")
+        choices = data.get("choices")
+        answer = data.get("answer")
+        if not isinstance(question, str) or not question.strip():
+            raise ValueError("문제(question)가 올바르지 않습니다.")
+        if not isinstance(choices, list) or not all(isinstance(c, str) for c in choices):
+            raise ValueError("선택지(choices)가 올바르지 않습니다.")
+        if not isinstance(answer, int) or isinstance(answer, bool):
+            raise ValueError("정답(answer)이 올바르지 않습니다.")
+        return cls(question, choices, answer)
