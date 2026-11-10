@@ -2,6 +2,7 @@
 
 import json
 import os
+import random
 
 from default_quizzes import get_default_quizzes
 from quiz import Quiz
@@ -102,9 +103,9 @@ class QuizGame:
 
         total = len(self.quizzes)
         correct_count = 0
-        print(f"\n퀴즈를 시작합니다! (총 {total}문제)")
+        print(f"\n퀴즈를 시작합니다! (총 {total}문제, 순서는 무작위)")
 
-        for number, quiz in enumerate(self.quizzes, start=1):
+        for number, quiz in enumerate(self.get_shuffled_quizzes(), start=1):
             quiz.display(number)
             user_answer = self.read_number(
                 f"정답 번호를 입력하세요 (1-{Quiz.CHOICE_COUNT}): ", 1, Quiz.CHOICE_COUNT
@@ -126,6 +127,16 @@ class QuizGame:
             print(f"현재 최고 점수: {self.best_score}점")
         self.save()
         return score
+
+    def get_shuffled_quizzes(self):
+        """출제 순서를 무작위로 섞은 퀴즈 목록을 반환한다.
+
+        원본 목록(self.quizzes)을 복사한 뒤 섞으므로,
+        퀴즈 목록 화면과 state.json에 저장되는 순서는 바뀌지 않는다.
+        """
+        shuffled = self.quizzes[:]
+        random.shuffle(shuffled)
+        return shuffled
 
     def calculate_score(self, correct_count, total):
         """정답 수를 100점 만점 점수로 환산한다."""
