@@ -1,5 +1,7 @@
 """한국사 퀴즈 게임 - 콘솔 프로그램 진입점"""
 
+from default_quizzes import get_default_quizzes
+
 
 class QuizGame:
     """퀴즈 게임 전체를 관리하는 클래스"""
@@ -14,6 +16,7 @@ class QuizGame:
 
     def __init__(self):
         self.running = True
+        self.quizzes = get_default_quizzes()  # 퀴즈 목록 (list[Quiz])
 
     # ---------- 입력 처리 ----------
     def read_number(self, prompt, min_value, max_value):
