@@ -91,6 +91,14 @@ class QuizGame:
                 continue
             return number
 
+    def read_text(self, prompt):
+        """비어 있지 않은 문자열을 입력받을 때까지 반복한다."""
+        while True:
+            text = input(prompt).strip()
+            if text:
+                return text
+            print("[안내] 입력이 비어 있습니다. 내용을 입력해 주세요.")
+
     # ---------- 메뉴 ----------
     def show_menu(self):
         print("\n" + "=" * 40)
@@ -158,7 +166,18 @@ class QuizGame:
         return round(correct_count / total * 100)
 
     def add_quiz(self):
-        print("\n[안내] 퀴즈 추가 기능은 준비 중입니다.")
+        """사용자에게 문제, 선택지 4개, 정답 번호를 입력받아 퀴즈를 등록한다."""
+        print("\n새 퀴즈를 등록합니다.")
+        question = self.read_text("문제를 입력하세요: ")
+        choices = []
+        for index in range(1, Quiz.CHOICE_COUNT + 1):
+            choices.append(self.read_text(f"선택지 {index}: "))
+        answer = self.read_number(f"정답 번호를 입력하세요 (1-{Quiz.CHOICE_COUNT}): ",
+                                  1, Quiz.CHOICE_COUNT)
+
+        self.quizzes.append(Quiz(question, choices, answer))
+        if self.save():
+            print(f"[완료] 퀴즈가 추가되었습니다. (현재 {len(self.quizzes)}문제)")
 
     def list_quizzes(self):
         print("\n[안내] 퀴즈 목록 기능은 준비 중입니다.")
