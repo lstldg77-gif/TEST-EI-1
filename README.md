@@ -595,3 +595,75 @@ git pull origin main     # → README 변경이 반영됨 (Fast-forward)
 
 - **clone**: 저장소가 내 컴퓨터에 **없을 때** 처음 한 번 전체를 복사
 - **pull**: 저장소가 **이미 있을 때** 새로 올라온 변경만 가져와 합침
+
+## 최종 결과물 충족 체크리스트
+
+과제의 **최종 결과물** 조건과 단계별 Git 요구사항을 이 저장소에서 어떻게 충족했는지 정리했습니다.
+
+### 1. 동작하는 퀴즈 게임
+
+| 조건 | 충족 | 근거 |
+|---|:---:|---|
+| 메뉴에서 번호를 선택하면 출제/등록/목록/점수/종료 화면이 출력된다 | ✅ | [실행 결과 1)~4)](#실행-결과) |
+| 퀴즈 풀기, 퀴즈 추가, 퀴즈 목록, 점수 확인 기능이 동작한다 | ✅ | `play()`, `add_quiz()`, `list_quizzes()`, `show_score()` |
+| 선택한 주제의 퀴즈가 5개 이상 포함되어 있다 | ✅ | 한국사 7문제 (`default_quizzes.py`) |
+| 종료 후 다시 실행해도 추가한 퀴즈와 최고 점수가 유지된다 | ✅ | [실행 결과 4)](#4-프로그램을-다시-실행한-뒤-점수-확인-파일-저장-유지) — 재실행 후 최고 점수 71점 유지 |
+
+### 2. 코드 구조
+
+| 조건 | 충족 | 근거 |
+|---|:---:|---|
+| 클래스가 2개 이상 정의되어 있다 | ✅ | `Quiz` (`quiz.py`), `QuizGame` (`quiz_game.py`) |
+| 기능별로 메서드가 분리되어 있다 (입력/게임 진행/저장) | ✅ | 입력 `read_number()` `read_text()` · 진행 `play()` 등 · 저장 `load()` `save()` |
+| 데이터를 프로젝트 루트의 `state.json`에 UTF-8로 저장·로드한다 | ✅ | `open(..., encoding="utf-8")`, 스키마 `quizzes` / `best_score` |
+
+### 3. 입력·예외 처리 기준
+
+| 조건 | 충족 | 근거 |
+|---|:---:|---|
+| 입력 앞뒤 공백 제거 후 처리 | ✅ | `input(prompt).strip()` |
+| 숫자 변환 실패(`abc`) 시 안내 후 재입력 | ✅ | `try/except ValueError` |
+| 허용 범위 밖 숫자(메뉴 `9`, 정답 `0`) 시 안내 후 재입력 | ✅ | `min_value <= number <= max_value` 검사 |
+| 빈 입력 시 안내 후 재입력 | ✅ | `if not text:` |
+| Ctrl+C / EOF 발생 시 안내, 저장 후 안전 종료 | ✅ | `except (KeyboardInterrupt, EOFError)` → `save()` |
+| 데이터 파일이 없으면 기본 퀴즈 사용 | ✅ | `os.path.exists()` → `reset_to_default()` |
+| 데이터 파일이 손상되면 안내 후 기본 데이터로 복구 | ✅ | [실행 결과 5)](#5-statejson이-손상된-경우) |
+| 퀴즈가 없거나 아직 풀지 않은 경우 처리 | ✅ | "등록된 퀴즈가 없습니다", "아직 퀴즈를 풀지 않았습니다" 안내 |
+
+### 4. GitHub 저장소
+
+| 조건 | 충족 | 근거 |
+|---|:---:|---|
+| 프로젝트 코드가 GitHub에 업로드되어 있다 | ✅ | https://github.com/lstldg77-gif/TEST-EI-1 |
+| 의미 있는 커밋 10개 이상 | ✅ | 20개 이상 (기능 `feat` 9개, `refactor` 1개, `docs` 등) |
+| 브랜치 생성 및 병합(checkout, merge) 기록 | ✅ | `feature/play-quiz` 브랜치 → `537c7e9 Merge branch 'feature/play-quiz' into main` |
+| clone 사용 기록 | ✅ | [clone / pull 실습](#clone--pull-실습) — `clone: from https://github.com/...` |
+| pull 사용 기록 | ✅ | [clone / pull 실습](#clone--pull-실습) — `pull origin main: Fast-forward` |
+| `.gitignore`, `README.md` 생성 | ✅ | `e6eed44` 첫 커밋 |
+| README 필수 항목 (개요, 주제 선정 이유, 실행 방법, 기능 목록, 파일 구조, 데이터 파일 설명) | ✅ | 이 문서 상단 6개 절 |
+
+### 5. 단계별 커밋 기록
+
+| 과제 단계 | 커밋 |
+|---|---|
+| 초기 설정 후 첫 커밋·푸시 | `e6eed44` chore: 프로젝트 초기 설정 (.gitignore, README.md) |
+| 메뉴 기능 완성 후 커밋 | `ee50e32` feat: 메뉴 출력 및 입력 검증 기능 구현 |
+| Quiz 클래스 작성 후 커밋 | `b51f756` feat: Quiz 클래스 작성 |
+| 기본 퀴즈 데이터 작성 후 커밋 | `af6364d` feat: 한국사 기본 퀴즈 데이터 7개 작성 |
+| 퀴즈 풀기 (브랜치에서 작업 → main 병합) | `69481f7` feat: 퀴즈 풀기 기능 구현 → `537c7e9` Merge |
+| 파일 입출력 기능 완성 후 커밋 | `8dd4748` feat: state.json 저장/불러오기 구현 |
+| 퀴즈 추가 기능 완성 후 커밋 | `20618b5` feat: 퀴즈 추가 기능 구현 |
+| 퀴즈 목록 기능 완성 후 커밋 | `ab25463` feat: 퀴즈 목록 보기 기능 구현 |
+| 점수 기능 완성 후 커밋 | `e44b89d` feat: 최고 점수 기록/갱신 및 점수 확인 기능 구현 |
+| QuizGame 클래스 구조 정리 후 커밋 | `5aa31bf` refactor: QuizGame 클래스를 quiz_game.py로 분리 |
+| README 작성 후 최종 푸시 | `88620f0` docs: README 작성 |
+| clone한 저장소에서 변경 → push | `ff640a2` docs: clone한 저장소에서 README에 clone/pull 실습 내용 추가 |
+| 보너스: 랜덤 출제 | `ec50530` feat: (보너스) 퀴즈 풀기 시 문제 순서 랜덤 출제 |
+
+### 6. 추가 자료
+
+| 자료 | 내용 |
+|---|---|
+| [docs/presentation.pdf](docs/presentation.pdf) | 발표 슬라이드 13장 |
+| [docs/BRIEFING.md](docs/BRIEFING.md) | 장별 발표 대본, 예상 질문, 시연 체크리스트 |
+| [docs/LEARNING_GOALS.md](docs/LEARNING_GOALS.md) | 과제 목표 항목별 말하기 대본, 꼬리 질문 |
