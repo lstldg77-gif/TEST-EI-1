@@ -159,7 +159,20 @@ class QuizGame:
         print("\n" + "-" * 40)
         print(f"결과: {total}문제 중 {correct_count}문제 정답 ({score}점)")
         print("-" * 40)
+
+        if self.update_best_score(score):
+            print(f"[축하] 최고 점수를 갱신했습니다! ({score}점)")
+        else:
+            print(f"현재 최고 점수: {self.best_score}점")
+        self.save()
         return score
+
+    def update_best_score(self, score):
+        """새 점수가 최고 점수보다 높으면 갱신하고 True를 반환한다."""
+        if self.best_score is None or score > self.best_score:
+            self.best_score = score
+            return True
+        return False
 
     def calculate_score(self, correct_count, total):
         """정답 수를 100점 만점 점수로 환산한다."""
@@ -189,7 +202,11 @@ class QuizGame:
             quiz.display(number)
 
     def show_score(self):
-        print("\n[안내] 점수 확인 기능은 준비 중입니다.")
+        """저장된 최고 점수를 출력한다."""
+        if self.best_score is None:
+            print("\n[안내] 아직 퀴즈를 풀지 않았습니다. 퀴즈를 풀면 최고 점수가 기록됩니다.")
+            return
+        print(f"\n최고 점수: {self.best_score}점 (100점 만점)")
 
 
 if __name__ == "__main__":
