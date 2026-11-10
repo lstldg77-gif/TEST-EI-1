@@ -47,7 +47,7 @@ python main.py
 
 | 번호 | 기능 | 설명 |
 |---|---|---|
-| 1 | 퀴즈 풀기 | 저장된 퀴즈를 차례로 출제하고 정답/오답을 바로 알려줍니다. 모든 문제를 풀면 정답 수와 점수(100점 만점)를 보여주고, 최고 점수보다 높으면 갱신해 저장합니다. 퀴즈가 없으면 안내 메시지를 출력합니다. |
+| 1 | 퀴즈 풀기 | 저장된 퀴즈를 **매번 무작위 순서로 섞어** 출제하고(보너스 과제) 정답/오답을 바로 알려줍니다. 모든 문제를 풀면 정답 수와 점수(100점 만점)를 보여주고, 최고 점수보다 높으면 갱신해 저장합니다. 퀴즈가 없으면 안내 메시지를 출력합니다. |
 | 2 | 퀴즈 추가 | 문제, 선택지 4개, 정답 번호(1~4)를 입력받아 새 퀴즈를 등록하고 즉시 파일에 저장합니다. |
 | 3 | 퀴즈 목록 | 등록된 모든 퀴즈의 문제와 선택지를 보여줍니다. (정답은 공개하지 않음) 퀴즈가 없으면 안내 메시지를 출력합니다. |
 | 4 | 점수 확인 | 최고 점수를 보여줍니다. 아직 퀴즈를 풀지 않았다면 안내 메시지를 출력합니다. |
@@ -151,10 +151,12 @@ TEST-EI-1/
 
 ### 2) 퀴즈 풀기 (정답/오답 표시, 결과, 최고 점수 갱신)
 
+> 보너스 과제(랜덤 출제) 적용으로 문제 순서는 실행할 때마다 달라집니다. 아래는 그중 한 번의 예입니다.
+
 ```
 메뉴를 선택하세요 (1-5): 1
 
-퀴즈를 시작합니다! (총 7문제)
+퀴즈를 시작합니다! (총 7문제, 순서는 무작위)
 
 [문제 1] 고조선을 건국한 것으로 전해지는 인물은?
   1. 주몽
@@ -269,6 +271,45 @@ TEST-EI-1/
 ## clone / pull 실습
 
 > 이 섹션은 `git clone`으로 복제한 별도 디렉터리(`TEST-EI-1-clone`)에서 추가한 뒤 push하고, 원래 작업 디렉터리에서 `git pull`로 가져온 내용입니다.
+
+퀴즈 게임 개발을 마친 뒤, 다른 사람이 저장소를 받아 수정하는 상황을 혼자 재현했습니다.
+
+### 실습 절차
+
+| 순서 | 위치 | 명령 | 결과 |
+|---|---|---|---|
+| 1 | 새 폴더 | `git clone https://github.com/lstldg77-gif/TEST-EI-1.git TEST-EI-1-clone` | 저장소 전체를 별도 폴더에 복제 |
+| 2 | `TEST-EI-1-clone` | README에 위 인용문 한 줄 추가 | 파일 수정 |
+| 3 | `TEST-EI-1-clone` | `git add README.md` → `git commit` → `git push origin main` | GitHub에 커밋 `ff640a2` 업로드 |
+| 4 | 원래 폴더 `TEST-EI-1` | `git pull origin main` | `ff640a2`를 받아와 README에 반영 (Fast-forward) |
+| 5 | 원래 폴더 `TEST-EI-1` | `tail README.md` | 위 인용문이 들어온 것 확인 |
+
+### 실행 기록 (git reflog)
+
+clone한 폴더 `TEST-EI-1-clone`:
+
+```
+$ git reflog
+ff640a2 HEAD@{2026-11-10 18:26:37 +0900}: commit: docs: clone한 저장소에서 README에 clone/pull 실습 내용 추가
+88620f0 HEAD@{2026-11-10 18:26:37 +0900}: clone: from https://github.com/lstldg77-gif/TEST-EI-1.git
+```
+
+원래 작업 폴더 `TEST-EI-1`:
+
+```
+$ git pull origin main
+Updating 88620f0..ff640a2
+Fast-forward
+ README.md | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+$ git reflog
+ff640a2 HEAD@{2026-11-10 18:26:44 +0900}: pull origin main: Fast-forward
+```
+
+- `clone: from ...` → **clone** 사용 기록
+- `pull origin main: Fast-forward` → **pull** 사용 기록 (clone 폴더에서 올린 커밋 `ff640a2`를 원래 폴더로 가져옴)
+- GitHub 커밋 목록의 `docs: clone한 저장소에서 README에 clone/pull 실습 내용 추가`가 clone 폴더에서 push한 커밋입니다.
 
 ## 보너스 과제: 랜덤 출제
 
@@ -510,7 +551,7 @@ except ValueError:
 |---|---|---|
 | `git init` | 현재 폴더를 Git 저장소로 만듦 (`.git` 폴더 생성) | 작업 폴더를 저장소로 초기화 |
 | `git add` | 커밋할 변경을 골라 **스테이징**에 올림 | `git add quiz.py` |
-| `git commit` | 스테이징된 변경을 **이력으로 확정** (메시지 포함) | 기능마다 커밋 (총 18개 이상) |
+| `git commit` | 스테이징된 변경을 **이력으로 확정** (메시지 포함) | 기능마다 커밋 (총 20개) |
 | `git push` | 로컬 커밋을 **원격 저장소(GitHub)에 업로드** | `git push origin main` |
 | `git pull` | 원격의 새 커밋을 **내려받아 합침** | clone 폴더에서 올린 변경을 원래 폴더로 가져옴 |
 | `git checkout` | **브랜치 이동** (`-b`: 새로 만들며 이동) | `git checkout -b feature/play-quiz` |
