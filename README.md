@@ -71,7 +71,9 @@ TEST-EI-1/
 ├── state.json           # 실행 데이터 (프로그램이 자동 생성, Git에는 올리지 않음)
 ├── docs/
 │   ├── BRIEFING.md      # 발표(브리핑) 자료: 장별 화면 내용, 발표 대본, 예상 질문
-│   └── LEARNING_GOALS.md # 과제 목표 설명 브리핑: 항목별 말하기 대본, 꼬리 질문
+│   ├── LEARNING_GOALS.md # 과제 목표 설명 브리핑: 항목별 말하기 대본, 꼬리 질문
+│   ├── presentation.pdf # 발표 슬라이드 13장 (GitHub에서 바로 보기)
+│   └── presentation.html # 발표 슬라이드 원본 (브라우저로 열기)
 ├── .gitignore
 └── README.md
 ```
@@ -551,7 +553,7 @@ except ValueError:
 |---|---|---|
 | `git init` | 현재 폴더를 Git 저장소로 만듦 (`.git` 폴더 생성) | 작업 폴더를 저장소로 초기화 |
 | `git add` | 커밋할 변경을 골라 **스테이징**에 올림 | `git add quiz.py` |
-| `git commit` | 스테이징된 변경을 **이력으로 확정** (메시지 포함) | 기능마다 커밋 (총 20개) |
+| `git commit` | 스테이징된 변경을 **이력으로 확정** (메시지 포함) | 기능마다 커밋 (총 20개 이상) |
 | `git push` | 로컬 커밋을 **원격 저장소(GitHub)에 업로드** | `git push origin main` |
 | `git pull` | 원격의 새 커밋을 **내려받아 합침** | clone 폴더에서 올린 변경을 원래 폴더로 가져옴 |
 | `git checkout` | **브랜치 이동** (`-b`: 새로 만들며 이동) | `git checkout -b feature/play-quiz` |
