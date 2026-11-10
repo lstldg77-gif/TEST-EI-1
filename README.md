@@ -112,3 +112,7 @@ TEST-EI-1/
   "best_score": 86
 }
 ```
+
+## clone / pull 실습
+
+> 이 섹션은 `git clone`으로 복제한 별도 디렉터리(`TEST-EI-1-clone`)에서 추가한 뒤 push하고, 원래 작업 디렉터리에서 `git pull`로 가져온 내용입니다.
