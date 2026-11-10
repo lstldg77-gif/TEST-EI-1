@@ -70,7 +70,8 @@ TEST-EI-1/
 ├── default_quizzes.py   # 기본 한국사 퀴즈 7개 (Quiz 인스턴스 목록)
 ├── state.json           # 실행 데이터 (프로그램이 자동 생성, Git에는 올리지 않음)
 ├── docs/
-│   └── BRIEFING.md      # 발표(브리핑) 자료: 장별 화면 내용, 발표 대본, 예상 질문
+│   ├── BRIEFING.md      # 발표(브리핑) 자료: 장별 화면 내용, 발표 대본, 예상 질문
+│   └── LEARNING_GOALS.md # 과제 목표 설명 브리핑: 항목별 말하기 대본, 꼬리 질문
 ├── .gitignore
 └── README.md
 ```
@@ -315,3 +316,239 @@ def get_shuffled_quizzes(self):
 [문제 6] 훈민정음을 창제한 조선의 왕은?
 [문제 7] 고려를 건국한 인물은?
 ```
+
+## 과제 목표 정리: 이 프로젝트로 설명하기
+
+과제 목표의 각 항목을 **이 프로젝트의 실제 코드**를 예로 들어 정리했습니다.
+말로 설명하는 발표용 대본은 [docs/LEARNING_GOALS.md](docs/LEARNING_GOALS.md)에 있습니다.
+
+### 1. Python 기초
+
+#### 변수란? 왜 쓰는가?
+
+**변수**는 값에 이름을 붙여 저장해 두는 상자입니다. 값을 기억해 두었다가 다시 쓰거나, 값이 바뀌어도 같은 이름으로 다룰 수 있습니다.
+
+```python
+correct_count = 0          # 맞힌 개수를 저장
+correct_count += 1         # 정답일 때마다 1씩 증가
+total = len(self.quizzes)  # 전체 문제 수
+```
+
+변수가 없으면 "지금까지 몇 개 맞혔는지"를 기억할 방법이 없습니다.
+
+#### int, str, bool, list, dict의 차이
+
+| 자료형 | 의미 | 이 프로젝트의 예 |
+|---|---|---|
+| `int` | 정수 | `answer = 3`, `best_score = 71` |
+| `str` | 문자열(글자) | `question = "고려를 건국한 인물은?"` |
+| `bool` | 참/거짓 (`True`/`False`) | `is_correct()`의 반환값, `self.running` |
+| `list` | 순서가 있는 여러 값의 목록 | `choices = ["왕건", "궁예", "견훤", "이성계"]`, `self.quizzes` |
+| `dict` | 키(이름)-값 쌍의 모음 | `{"question": ..., "choices": ..., "answer": 3}` (state.json 저장 형태) |
+
+- list는 **번호(인덱스)**로 꺼냅니다: `choices[0]` → `"왕건"`
+- dict는 **키 이름**으로 꺼냅니다: `data["quizzes"]`
+
+#### if / elif / else
+
+조건에 따라 다른 동작을 합니다. 메뉴 번호에 따라 다른 기능을 실행하는 `handle_choice()`가 대표적입니다.
+
+```python
+if choice == 1:
+    self.play()
+elif choice == 2:
+    self.add_quiz()
+elif choice == 3:
+    self.list_quizzes()
+elif choice == 4:
+    self.show_score()
+else:
+    self.quit()
+```
+
+위에서부터 차례로 검사해서 **처음으로 참인 블록 하나만** 실행됩니다.
+
+#### for와 while의 차이
+
+| | `for` | `while` |
+|---|---|---|
+| 언제 쓰나 | **반복 횟수(대상)가 정해져 있을 때** | **조건이 참인 동안 계속, 끝을 미리 모를 때** |
+| 이 프로젝트 | 퀴즈 목록을 하나씩 출제 | 올바른 입력이 들어올 때까지 다시 묻기, 메뉴 반복 |
+
+```python
+# for: 퀴즈 개수만큼 정확히 반복
+for number, quiz in enumerate(self.get_shuffled_quizzes(), start=1):
+    quiz.display(number)
+
+# while: 사용자가 올바른 숫자를 넣을 때까지 몇 번이 될지 모름
+while True:
+    text = input(prompt).strip()
+    ...
+    return number   # 올바르면 반복 종료
+```
+
+#### 함수, 매개변수, 반환값
+
+- **함수**: 자주 쓰는 동작을 이름 붙여 묶어 둔 것
+- **매개변수**: 함수에 넘겨주는 값
+- **반환값**: 함수가 일을 마치고 돌려주는 결과 (`return`)
+
+```python
+def read_number(self, prompt, min_value, max_value):   # 매개변수 3개
+    ...
+    return number                                       # 검증된 정수를 반환
+
+choice = self.read_number("메뉴를 선택하세요 (1-5): ", 1, 5)   # 메뉴용
+answer = self.read_number("정답 번호를 입력하세요 (1-4): ", 1, 4)  # 정답용
+```
+
+같은 함수를 매개변수만 바꿔 여러 곳에서 **재사용**합니다.
+
+### 2. 클래스와 객체
+
+#### 클래스란? 왜 쓰는가?
+
+**클래스**는 데이터(속성)와 그 데이터를 다루는 동작(메서드)을 하나로 묶은 **설계도**이고, **객체**는 그 설계도로 만든 실제 물건입니다.
+
+- `Quiz` 클래스 = "퀴즈 한 문제"의 설계도 → 객체 7개(+추가한 퀴즈)를 만듦
+- `QuizGame` 클래스 = "게임 전체"의 설계도 → 객체 1개를 만들어 실행
+
+클래스로 묶으면 관련된 코드가 한곳에 모여 **읽기 쉽고, 고치기 쉽고, 재사용**하기 좋습니다.
+
+#### `__init__`과 `self`
+
+```python
+class Quiz:
+    def __init__(self, question, choices, answer):
+        self.question = question
+        self.choices = list(choices)
+        self.answer = answer
+
+q = Quiz("고려를 건국한 인물은?", ["왕건", "궁예", "견훤", "이성계"], 1)
+```
+
+- **`__init__`**: 객체를 만들 때(`Quiz(...)`) **자동으로 실행**되는 초기화 메서드. 객체가 가질 속성을 처음 설정합니다.
+- **`self`**: **지금 만들어지는(또는 메서드를 호출한) 객체 자기 자신**. `self.question`은 "이 퀴즈 객체의 문제"라는 뜻이라, 퀴즈가 여러 개여도 각자 자기 값을 가집니다.
+
+#### 속성(attribute)과 메서드(method)
+
+| | 속성 (데이터) | 메서드 (동작) |
+|---|---|---|
+| `Quiz` | `question`, `choices`, `answer` | `display()`, `is_correct()`, `to_dict()`, `from_dict()` |
+| `QuizGame` | `quizzes`, `best_score`, `state_file` | `run()`, `play()`, `add_quiz()`, `load()`, `save()` 등 |
+
+```python
+quiz.display(1)            # 메서드 호출: 문제 출력
+if quiz.is_correct(2):     # 메서드 호출: 정답 확인 → True/False
+    ...
+print(quiz.answer)         # 속성 사용
+```
+
+### 3. 파일 입출력
+
+#### 파일을 열고, 읽고, 쓰는 과정
+
+1. **열기** `open(경로, 모드, encoding="utf-8")` — `"r"` 읽기, `"w"` 쓰기
+2. **읽기/쓰기** `json.load(file)` / `json.dump(data, file)`
+3. **닫기** `with` 문을 쓰면 블록이 끝날 때 **자동으로 닫힘**
+
+```python
+# 쓰기 (save)
+with open(self.state_file, "w", encoding="utf-8") as file:
+    json.dump(data, file, ensure_ascii=False, indent=2)
+
+# 읽기 (load)
+with open(self.state_file, "r", encoding="utf-8") as file:
+    data = json.load(file)
+```
+
+`encoding="utf-8"`로 한글이 깨지지 않게 하고, `ensure_ascii=False`로 파일 안의 한글이 `\uXXXX`가 아닌 글자 그대로 저장되게 했습니다.
+
+#### JSON이란? 왜 데이터 저장에 쓰는가?
+
+**JSON**(JavaScript Object Notation)은 `{ }`(객체)와 `[ ]`(배열)로 데이터를 표현하는 **텍스트 형식**입니다.
+
+- 파이썬의 **dict ↔ JSON 객체**, **list ↔ JSON 배열**이 그대로 대응해 변환이 쉽습니다.
+- 사람이 메모장으로 열어도 **읽고 고칠 수 있는** 텍스트입니다.
+- 거의 모든 언어가 지원하는 **표준 형식**이라 다른 프로그램과 주고받기도 좋습니다.
+
+단, Quiz **객체**는 JSON에 바로 넣을 수 없어서 `to_dict()`로 dict로 바꿔 저장하고, 불러올 때 `from_dict()`로 다시 객체로 만듭니다.
+
+#### try / except로 오류 처리
+
+오류가 날 수 있는 코드를 `try`에 넣고, 오류가 나면 `except`에서 처리해 **프로그램이 멈추지 않게** 합니다.
+
+```python
+try:
+    number = int(text)            # "abc"면 ValueError 발생
+except ValueError:
+    print("[안내] 숫자를 입력해 주세요.")
+    continue                      # 다시 입력받기
+```
+
+| 오류 | 언제 | 처리 |
+|---|---|---|
+| `ValueError` | 숫자가 아닌 입력, 손상된 JSON | 안내 후 재입력 / 기본 데이터로 복구 |
+| `OSError` | 파일 읽기·쓰기 실패 | 안내 메시지 출력 |
+| `KeyError`, `TypeError` | JSON 구조가 예상과 다름 | 기본 데이터로 복구 |
+| `KeyboardInterrupt`, `EOFError` | Ctrl+C, 입력 종료 | 저장 후 안전 종료 |
+
+### 4. Git 기초
+
+#### Git이란? 왜 필요한가?
+
+**Git**은 파일의 변경 이력을 기록하는 **버전 관리 도구**입니다.
+
+- 언제, 무엇을, 왜 바꿨는지 **기록**이 남습니다. (이 프로젝트의 `git log`가 곧 개발 일지)
+- 잘못 고쳤을 때 **이전 상태로 되돌릴** 수 있습니다.
+- **브랜치**로 기존 코드를 건드리지 않고 새 기능을 실험할 수 있습니다.
+- GitHub 같은 원격 저장소로 **백업하고 여러 사람이 협업**할 수 있습니다.
+
+#### 주요 명령어
+
+| 명령어 | 하는 일 | 이 프로젝트에서 |
+|---|---|---|
+| `git init` | 현재 폴더를 Git 저장소로 만듦 (`.git` 폴더 생성) | 작업 폴더를 저장소로 초기화 |
+| `git add` | 커밋할 변경을 골라 **스테이징**에 올림 | `git add quiz.py` |
+| `git commit` | 스테이징된 변경을 **이력으로 확정** (메시지 포함) | 기능마다 커밋 (총 18개 이상) |
+| `git push` | 로컬 커밋을 **원격 저장소(GitHub)에 업로드** | `git push origin main` |
+| `git pull` | 원격의 새 커밋을 **내려받아 합침** | clone 폴더에서 올린 변경을 원래 폴더로 가져옴 |
+| `git checkout` | **브랜치 이동** (`-b`: 새로 만들며 이동) | `git checkout -b feature/play-quiz` |
+| `git clone` | 원격 저장소 **전체를 처음 복제** | 별도 폴더 `TEST-EI-1-clone`에 복제 |
+
+#### 브랜치 생성과 병합
+
+```bash
+git checkout -b feature/play-quiz        # 1. 브랜치 생성 + 이동
+# ... 퀴즈 풀기 기능 개발 ...
+git add main.py
+git commit -m "feat: 퀴즈 풀기 기능 구현"  # 2. 브랜치에서 커밋
+git checkout main                        # 3. main으로 돌아옴
+git merge --no-ff feature/play-quiz      # 4. 브랜치를 main에 병합
+```
+
+```
+*   Merge branch 'feature/play-quiz' into main
+|\
+| * feat: 퀴즈 풀기 기능 구현
+|/
+* feat: 한국사 기본 퀴즈 데이터 7개 작성
+```
+
+#### clone과 pull
+
+```bash
+# 다른 폴더에서
+git clone https://github.com/lstldg77-gif/TEST-EI-1.git TEST-EI-1-clone
+cd TEST-EI-1-clone
+# README 수정 후
+git add README.md
+git commit -m "docs: clone한 저장소에서 README에 clone/pull 실습 내용 추가"
+git push origin main
+
+# 원래 작업 폴더에서
+git pull origin main     # → README 변경이 반영됨 (Fast-forward)
+```
+
+- **clone**: 저장소가 내 컴퓨터에 **없을 때** 처음 한 번 전체를 복사
+- **pull**: 저장소가 **이미 있을 때** 새로 올라온 변경만 가져와 합침
