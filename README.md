@@ -69,6 +69,8 @@ TEST-EI-1/
 ├── quiz.py              # Quiz 클래스: 문제 1개(문제/선택지/정답), 출력, 정답 확인, dict 변환
 ├── default_quizzes.py   # 기본 한국사 퀴즈 7개 (Quiz 인스턴스 목록)
 ├── state.json           # 실행 데이터 (프로그램이 자동 생성, Git에는 올리지 않음)
+├── docs/
+│   └── BRIEFING.md      # 발표(브리핑) 자료: 장별 화면 내용, 발표 대본, 예상 질문
 ├── .gitignore
 └── README.md
 ```
